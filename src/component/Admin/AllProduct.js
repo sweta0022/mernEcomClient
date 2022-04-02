@@ -1,6 +1,7 @@
 import React, { useEffect,useState } from "react";
 import { DataGrid } from "@material-ui/data-grid";
-// import "./AllProduct.css";
+import "./AllProduct.css";
+import Loader from "../layout/Loader/Loader";
 // import { useSelector, useDispatch } from "react-redux";
 
 import { Link } from "react-router-dom";
@@ -19,9 +20,25 @@ const AllProduct = ({ history }) => {
     const [products , setProducts] = useState([]);
 
     const getAllProduct = async () => {
-        setLoading(true);
-        const data = await axios.get("/api/v1/admin/products");
-        console.log(data);
+        try
+        {
+            setLoading(true);
+            const data = await axios.get("/api/v1/admin/products");
+            setLoading(false);
+           if( data.data.status === 200 )
+           {
+             setProducts(data.data.result);
+           }
+           else
+           {
+            alert.error(data.data.message);
+           }
+        }
+        catch(err)
+        {          
+          alert.error(err.response.data.message); 
+        }    
+       
     }
 
     useEffect(() => {
@@ -80,26 +97,42 @@ const AllProduct = ({ history }) => {
 
     const rows = [];
 
+    
+    products &&
+    products.forEach((item) => {
+      rows.push({
+        id: item._id,
+        stock: item.Stock,
+        price: item.price,
+        name: item.name,
+      });
+    });
+    
+
     return(
         <>
-             <MetaData title={`ALL PRODUCTS - Admin`} />
+         {loading?<Loader/>:<>
+           <MetaData title={`ALL PRODUCTS - Admin`} />
 
-                <div className="dashboard">
-                <SideBar />
-                <div className="productListContainer">
-                    <h1 id="productListHeading">ALL PRODUCTS</h1>
+            <div className="dashboard">
+            <SideBar />
+            <div className="productListContainer">
+                <h1 id="productListHeading">ALL PRODUCTS</h1>
 
-                    <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSize={10}
-                    disableSelectionOnClick
-                    className="productListTable"
-                    autoHeight
-                    />
-                </div>
-                </div>
+                <DataGrid
+                rows={rows}
+                columns={columns}
+                pageSize={10}
+                disableSelectionOnClick
+                className="productListTable"
+                autoHeight
+                />
+            </div>
+            </div>
+            </>
+         }
         </>
+       
     )
 }
 

@@ -12,6 +12,7 @@ import PasswordUpdate from "./component/User/PasswordUpdate.js";
 import ProtectedRoute from "./component/Route/ProtectedRoute";
 import Dashboard from "./component/Admin/Dashboard.js";
 import AllProduct from "./component/Admin/AllProduct.js";
+import CreateProduct from "./component/Admin/CreateProduct.js";
 
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { useEffect } from "react";
@@ -39,9 +40,10 @@ function App() {
          <ProtectedRoute exact path="/password/update" component={PasswordUpdate} />
          <ProtectedRoute isAdmin={true} exact path="/admin/dashboard" component={Dashboard} />
          <ProtectedRoute isAdmin={true} exact path="/admin/all-products" component={AllProduct} />
+         <ProtectedRoute isAdmin={true} exact path="/admin/product/create" component={CreateProduct} />
          <Route exact path="/product/:id" component={ProductDetail} />
          <Route exact path="/login" component={LoginSignup} />
-
+         
          
       <Footer/>
     </Router>

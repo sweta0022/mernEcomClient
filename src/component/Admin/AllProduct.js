@@ -18,6 +18,7 @@ const AllProduct = ({ history }) => {
 
     const [loading , setLoading] = useState(false);
     const [products , setProducts] = useState([]);
+    // const [error , setError] = useState(false);
 
     const getAllProduct = async () => {
         try
@@ -39,6 +40,31 @@ const AllProduct = ({ history }) => {
           alert.error(err.response.data.message); 
         }    
        
+    }
+
+    const deleteProductHandler = async(id) => {
+      setLoading(true);
+      try
+      {
+        const response = await axios.delete(`/api/v1/admin/product/${id}`);
+       
+        if(response.data.status)
+        {
+          alert.success(response.data.message);
+          getAllProduct();
+          setLoading(false);
+        }
+        else
+        {
+          alert.error(response.data.message);
+        }
+        
+      }
+      catch(error)
+      {
+        setLoading(false);
+        alert.error(error.response.data.message);
+      }
     }
 
     useEffect(() => {
@@ -82,9 +108,9 @@ const AllProduct = ({ history }) => {
                   </Link>
       
                   <Button
-                    // onClick={() =>
-                    //   deleteProductHandler(params.getValue(params.id, "id"))
-                    // }
+                    onClick={() =>
+                      deleteProductHandler(params.getValue(params.id, "id"))
+                    }
                   >
                     <DeleteIcon />
                   </Button>

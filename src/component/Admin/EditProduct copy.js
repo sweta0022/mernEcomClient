@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import "./CreateProduct.css";
+import React, { useEffect, useState } from "react";
 import { useAlert } from "react-alert";
 import { Button } from "@material-ui/core";
 import MetaData from "../layout/MetaData";
@@ -8,21 +7,26 @@ import DescriptionIcon from "@material-ui/icons/Description";
 import StorageIcon from "@material-ui/icons/Storage";
 import SpellcheckIcon from "@material-ui/icons/Spellcheck";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
+import { clearErrors,getProductDetails } from "./../../actions/productActions";
 import SideBar from "./Sidebar";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
 
-const CreateProduct = ({history}) => {
-    const alert = useAlert();
 
-    const [name,setName] = useState("");
-    const [price,setPrice] = useState("");
-    const [description,setDescription] = useState("");
-    const [category,setCategory] = useState("");
-    const [stock,setStock] = useState("");
-    const [images,setImages] = useState([]);
-    const [imagesPreview,setImagesPreview] = useState([]);
-    const [loading,setLoading] = useState(false);
+const EditProduct = ({match,history}) => {
+    const dispatch = useDispatch(); 
+    const { product  } = useSelector( (state) => state.productDetails );
+      const alert = useAlert();
 
-    
+    const [loading, setLoading ] = useState("");
+    const [name, setName ] = useState("");
+    const [price, setPrice ] = useState(0);
+    const [description, setDescription ] = useState("");
+    const [category, setCategory ] = useState("");
+    const [stock, setStock ] = useState(0);
+    const [images, setImages] = useState([]);
+    const [oldImages, setOldImages] = useState([]);
+    const [imagesPreview, setImagesPreview] = useState([]);
 
     const categories = [
         "Laptop",
@@ -34,7 +38,51 @@ const CreateProduct = ({history}) => {
         "SmartPhones",
       ];
 
-    const createProductSubmitHandler = async (e) => {
+      const productId = match.params.id;
+
+      useEffect(() => {
+        
+        dispatch(getProductDetails(productId));
+        setName('product.name');
+        if(product)
+        {  
+            //   setName('product.name');
+            //   setPrice('product.price');
+            //   setDescription('product.description');
+            //   setCategory(product.category);
+            //   setStock(product.Stock);
+            //   setOldImages(product.images);
+        } 
+
+       
+      
+      },[product,dispatch,productId])
+    // },[dispatch,product,productId,error,alert])
+    // },[alert,dispatch,error,product, history,productId,match.params.id])
+
+    
+      const updateProductImagesChange = (e) => {
+        const files = Array.from(e.target.files);
+
+        setImages([]);
+        setImagesPreview([]);
+        setOldImages([]);
+    
+        files.forEach((file) => {
+          const reader = new FileReader();
+    
+          reader.onload = () => {
+            if (reader.readyState === 2) {
+              setImagesPreview((old) => [...old, reader.result]);
+              setImages((old) => [...old, reader.result]);
+            }
+          };
+    
+          reader.readAsDataURL(file);
+        });
+      }
+
+    const updateProductSubmitHandler = async(e) => {
         e.preventDefault();
      
         const myForm = new FormData();
@@ -52,21 +100,22 @@ const CreateProduct = ({history}) => {
       
     try{
         setLoading(true);
-        const response = await fetch('/api/v1/admin/product/create',{
-            method: "POST",
-            body: myForm
-        });
+        const config = { headers: { "Content-Type": "application/json" } };
+        const response = await axios.put(`/api/v1/admin/product/${productId}`,
+            myForm,
+            config
+        );
 
-        const data = await response.json(response);
+        // const data = await response.json(response);
         setLoading(false);
-        if(data.status === 200)
+        if(response.data.status === 200)
         {
-            alert.success(data.message);
+            alert.success(response.data.message);
             history.push('/admin/all-products');
         }
         else
         {
-            alert.success(data.message);
+            alert.success(response.data.message);
         }
     }
     catch(error)
@@ -74,28 +123,7 @@ const CreateProduct = ({history}) => {
       alert.error(error.data.message); 
     }
 
-
-         
     }
-
-    const createProductImagesChange = async (e) => {
-        const files = Array.from(e.target.files);
-        setImages([]);
-        setImagesPreview([]);
-        files.forEach((file) => {
-            const reader = new FileReader();
-      
-            reader.onload = () => {
-              if (reader.readyState === 2) {
-                setImagesPreview((old) => [...old, reader.result]);
-                setImages((old) => [...old, reader.result]);
-              }
-            };
-      
-            reader.readAsDataURL(file);
-          });
-    }
-
     return(
         <>
             <MetaData title="Create Product" />
@@ -105,7 +133,7 @@ const CreateProduct = ({history}) => {
                 <form
                     className="createProductForm"
                     encType="multipart/form-data"
-                    onSubmit={createProductSubmitHandler}
+                    onSubmit={updateProductSubmitHandler}
                 >
                     <h1>Create Product</h1>
 
@@ -126,6 +154,7 @@ const CreateProduct = ({history}) => {
                         placeholder="Price"
                         required
                         onChange={(e) => setPrice(e.target.value)}
+                        value={price}
                     />
                     </div>
 
@@ -143,7 +172,10 @@ const CreateProduct = ({history}) => {
 
                     <div>
                     <AccountTreeIcon />
-                    <select onChange={(e) => setCategory(e.target.value)}>
+                    <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                    >
                         <option value="">Choose Category</option>
                         {categories.map((cate) => (
                         <option key={cate} value={cate}>
@@ -160,6 +192,7 @@ const CreateProduct = ({history}) => {
                         placeholder="Stock"
                         required
                         onChange={(e) => setStock(e.target.value)}
+                        value={stock}
                     />
                     </div>
 
@@ -168,9 +201,16 @@ const CreateProduct = ({history}) => {
                         type="file"
                         name="avatar"
                         accept="image/*"
-                        onChange={createProductImagesChange}
+                        onChange={updateProductImagesChange}
                         multiple
                     />
+                    </div>
+
+                    <div id="createProductFormImage">
+                    {oldImages &&
+                        oldImages.map((image, index) => (
+                        <img key={index} src={image.url} alt="Old Product Preview" />
+                        ))}
                     </div>
 
                     <div id="createProductFormImage">
@@ -193,4 +233,4 @@ const CreateProduct = ({history}) => {
     )
 }
 
-export default CreateProduct
+export default EditProduct;

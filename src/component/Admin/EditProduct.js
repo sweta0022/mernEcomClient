@@ -231,7 +231,7 @@ const EditProduct = ({match,history}) => {
                     type="submit"
                     disabled={loading ? true : false}
                     >
-                    Create
+                    Update
                     </Button>
                 </form>
                 </div>

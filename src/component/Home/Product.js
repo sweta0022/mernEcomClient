@@ -16,12 +16,12 @@ const Product = ( {product} ) => {
     
     return (
         <Link className="productCard" to={`/product/${product._id}`}>
-            <img src={"http://localhost:3001"+product.images[0].uri} alt={product.name} />
+            <img src={product.images[0].url} alt={product.name} />
             <p>{product.name}</p>
             <div>
             <ReactStars {...options} /> <span> ({product.numOfReviews} Reviews) </span>
             </div>
-            <span>{`$${product.price}`}</span>
+            <span>{`Rs.${product.price}`}</span>
         </Link>
     );
 }

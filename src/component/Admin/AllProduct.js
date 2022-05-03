@@ -103,7 +103,7 @@ const AllProduct = ({ history }) => {
             renderCell: (params) => {
               return (
                 <>
-                  <Link to={`/admin/product/${params.getValue(params.id, "id")}`}>
+                  <Link to={`/admin/product/edit/${params.getValue(params.id, "id")}`}>
                     <EditIcon />
                   </Link>
       

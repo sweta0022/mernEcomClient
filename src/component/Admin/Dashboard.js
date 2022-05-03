@@ -18,10 +18,12 @@ const Dashboard = () => {
 
   const [outOfStock ,setOutOfStock] = useState(0);
   const [inStock ,setInStock] = useState(0);
+  const [allUserCount ,setAllUserCount] = useState(0);
 
   useEffect(() => {
      getOutOfStockCount();
      getInStockCount();
+     getAllUserCount();
   },[])
 
   const getOutOfStockCount = async () => {
@@ -63,6 +65,26 @@ const Dashboard = () => {
     }
     
   }
+
+  const getAllUserCount = async () => {
+    try
+    {
+        const response = await axios.get('/api/v1/admin/getAllUserCount');
+        if(response.data.status === 200)
+        {
+          setAllUserCount(response.data.result);
+        }
+        else
+        {
+          alert.error(response.data.message);
+        }
+    }
+    catch(error)
+    {
+      alert.error(error.response.data.message); 
+    }
+    
+  }  
 
   const lineState = {
     labels: ["Initial Amount","Amount Earned"],
@@ -107,6 +129,11 @@ const Dashboard = () => {
                 <p>Product</p>
                 <p>{outOfStock + inStock}</p>
               </Link>
+
+              <Link to="/admin/users">
+                <p>Users</p>
+                <p>{allUserCount}</p>
+              </Link>
              
             
             </div>
@@ -119,7 +146,6 @@ const Dashboard = () => {
           <div className="doughnutChart">
             <Doughnut data={doughnutState} />
           </div>
-          
         </div>
       </div>
     )

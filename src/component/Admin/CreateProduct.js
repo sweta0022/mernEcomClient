@@ -66,7 +66,7 @@ const CreateProduct = ({history}) => {
         }
         else
         {
-            alert.success(data.message);
+            alert.error(data.message);
         }
     }
     catch(error)

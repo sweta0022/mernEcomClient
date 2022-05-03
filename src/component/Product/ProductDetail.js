@@ -1,33 +1,42 @@
 import './ProductDetail.css';
 import Carousel from "react-material-ui-carousel";
 import { useSelector, useDispatch } from "react-redux";
-// import { useAlert } from 'react-alert';
-import { useEffect } from 'react';
+import { useAlert } from 'react-alert';
+import { useEffect, useState } from 'react';
 import { getProductDetails } from "./../../actions/productActions";
 import Loader from "./../layout/Loader/Loader";
 import ReactStars from "react-rating-stars-component";
 import ReviewCard from "./ReviewCard.js";
+import { addItemsToCart } from "../../actions/cartAction";
 
 const ProductDetail = ({match}) => {
-
-
-
-    const dispatch = useDispatch(); 
-    // const alert = useAlert();
+    const dispatch = useDispatch();
+    const alertbox = useAlert();
+    const [quantity, setQuantity] = useState(1);
     
     const { loading,error,product } = useSelector( (state) =>state.productDetails );
+
+    // Spread Operator
+    // used for concatenation in array
+    // const fullname = ['vinod','thapa']; // vinod,thapa
+    // const biodata = [1,...fullname,26,'male'];//1,vinod,thapa,26,male
+    //destructuring of an array
+    // const shootergame = ['a','b','c','d'];
+    // const [first,...remaining] = shootergame;
+    // console.log(first); // a
+    // console.log(remaining); // b,c,d
+    //add to object or use another object in a object
+    // const fullname = {'name':'vinod','lastname':'thapa'}; 
+    // const biodata = { 'id':'1','age':'27',...fullname };
 
     useEffect( () => {  
     
         if(error)
         {
-          alert.error(error);
+            alertbox.error(error);
         }
-        else
-        {  
-            dispatch( getProductDetails(match.params.id) );
-        }
-       
+        dispatch( getProductDetails(match.params.id) );
+      
     },[dispatch,error, match.params.id] )
 
     const options = {
@@ -37,6 +46,23 @@ const ProductDetail = ({match}) => {
         size: window.innerWidth < 600 ? 20 : 25,
         value: product && product.rating,
         isHalf: true,
+    }
+
+    const decreaseQuantity = () => {
+        if(quantity <= 1) return;
+        const qty = quantity - 1;
+        setQuantity(qty);
+    }
+
+    const increaseQuantity = () => {
+        if(product.Stock <= quantity) return;
+        const qty = quantity + 1;
+        setQuantity(qty);
+    }
+
+    const addToCartHandler = () => {
+        dispatch( addItemsToCart( match.params.id , quantity ) );
+        alertbox.success("Item added to cart");
     }
 
 
@@ -68,8 +94,7 @@ const ProductDetail = ({match}) => {
                                             <img
                                             className="CarouselImage"
                                             key={i}
-                                            src="https://i.ibb.co/DRST11n/1.webP"
-                                            // src={"http://localhost:3001"+item.uri}
+                                            src={item.url}
                                             alt={`${i} Slide`}
                                             width="500px"
                                             />
@@ -95,19 +120,22 @@ const ProductDetail = ({match}) => {
                                     <h1>{`₹${product && product.price}`}</h1>
                                     <div className="detailsBlock-3-1">
                                         <div className="detailsBlock-3-1-1">
-                                            <button>-</button>
-                                            <input type="number" value="1" />
-                                            <button>+</button>
+                                            <button onClick={decreaseQuantity}>-</button>
+                                            <input type="number" value={quantity} />
+                                            <button onClick={increaseQuantity}>+</button>
                                         </div>
-                                        <button >
+                                        <button
+                                         disabled={product && product.Stock < 1 ? true : false}
+                                         onClick={addToCartHandler}
+                                        >
                                             Add to Cart
                                         </button>
                                     </div>
 
                                     <p>
                                     Status:
-                                        <b className="greenColor">
-                                            InStock
+                                        <b className={product && product.Stock < 1 ? "redColor" : "greenColor"}>
+                                        {product && product.Stock < 1 ? "Out Of Stock" : "In Stock"}
                                         </b>
                                     </p>
                                     

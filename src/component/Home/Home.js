@@ -1,35 +1,62 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { CgMouse } from "react-icons/all";
 import "./Home.css";
 import Product from "./Product.js";
 import MetaData from "./../layout/MetaData";
-import { getAllProducts } from "./../../actions/productActions";
-import { useSelector, useDispatch } from "react-redux";
+// import { getAllProducts } from "./../../actions/productActions";
+// import { useSelector, useDispatch } from "react-redux";
 import Loader from "./../layout/Loader/Loader";
 import { useAlert } from "react-alert";
+import axios from "axios";
 
 const Home = () => {  // useSelector is used to fetch data from state
-  const dispatch = useDispatch(); 
-  const alert = useAlert();
+  // const dispatch = useDispatch(); 
+  const customAlert = useAlert();
+
+  const [loading , setLoading] = useState(false);
+  const [products , setProducts] = useState([]);
+
+  useEffect( async() => {
+    try
+    {
+        const response = await axios.get('/api/v1/getFeatureProduct');
+       
+        // console.log(response.data.status);
+        if(response.data.status === 200)
+        {  
+          setProducts(response.data.productList);
+        }
+        else
+        {
+          customAlert.error(response.data.message);
+        }
+    }
+    catch(err)
+    {
+      customAlert.error(err.response.data.message);
+    }
+     
+
+  },[])
 
  
-  const { loading, error, products } = useSelector( 
-    (state) => state.products
-  );
+  // const { loading, error, products } = useSelector( 
+  //   (state) => state.products
+  // );
 
 
 
-  useEffect( () => {
-    if(error)
-    {
-      alert.error(error);
-    }
-    else
-    {
-      dispatch( getAllProducts()); 
-    }
+  // useEffect( () => {
+  //   if(error)
+  //   {
+  //     alert.error(error);
+  //   }
+  //   else
+  //   {
+  //     dispatch( getAllProducts()); 
+  //   }
 
-  },[dispatch, error, alert] )
+  // },[dispatch, error, alert] )
 
   // const product = {
   //   name: "Blue Tshirt",
@@ -51,7 +78,7 @@ const Home = () => {  // useSelector is used to fetch data from state
                   </button>
                   </a>
             </div>
-            <h2 className="homeHeading">Featured Products</h2>
+            <h2 className="homeHeading">Featured Products </h2>
 
           { loading ? 
               (

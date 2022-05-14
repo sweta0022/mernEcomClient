@@ -107,10 +107,11 @@ const LoginSignUp = ({ history, location }) => {
         dispatch(clearErrors);
       }
 
+      const redirect = (location.search)? location.search.split("=")[1] : '/account';
+
      if(isAuthenticated)
-     {
-      alert.error("Successfully Logged In");
-      history.push('/account');
+     {      
+      history.push(redirect);
      }
 
     },[dispatch,error,alert,isAuthenticated, history] );

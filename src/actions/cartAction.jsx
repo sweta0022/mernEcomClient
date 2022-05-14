@@ -1,6 +1,7 @@
 import {
     ADD_TO_CART,   
     REMOVE_CART_ITEM,
+    SAVE_SHIPPING_INFO,
     CLEAR_ERRORS
 } from "./../constants/cartConstant";
 
@@ -49,4 +50,23 @@ export const removeItemsFromCart = (id) => async (dispatch,getState) => {
     {
        
     }
+
+   
+}
+
+export const saveShippingInfo = (data) => async (dispatch) => {
+    try
+    {
+        dispatch({
+            type: SAVE_SHIPPING_INFO,
+            payload: data,
+          });
+          
+        localStorage.setItem("shippingInfo", JSON.stringify(data));
+    }
+    catch( error )
+    {
+       //
+    }
+
 }

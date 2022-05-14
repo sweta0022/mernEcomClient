@@ -19,6 +19,11 @@ import CreateProduct from "./component/Admin/CreateProduct.js";
 import EditProduct from "./component/Admin/EditProduct.js";
 import Users from "./component/Admin/Users.js";
 import Cart from "./component/Cart/Cart.js";
+import Shipping from "./component/Cart/Shipping.js";
+import ConfirmOrder from "./component/Cart/ConfirmOrder.js";
+import Payment from "./component/Cart/Payment.js";
+
+
 
 
 
@@ -57,6 +62,9 @@ function App() {
          <Route exact path="/product/:id" component={ProductDetail} />
          <Route exact path="/login" component={LoginSignup} />
          <Route exact path="/cart" component={Cart} />
+         <Route exact path="/shipping" component={Shipping} />
+         <Route exact path="/order/confirm" component={ConfirmOrder} />
+         <Route exact path="/process/payment" component={Payment} />
          
          
       <Footer/>

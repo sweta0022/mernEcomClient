@@ -7,7 +7,7 @@ import { Typography } from "@material-ui/core";
 import RemoveShoppingCartIcon from "@material-ui/icons/RemoveShoppingCart";
 import { Link } from "react-router-dom";
 
-const Cart = () => {
+const Cart = ({history}) => {
     const dispatch = useDispatch();
     const { cartItems } = useSelector((state) => state.cart);
 
@@ -30,7 +30,7 @@ const Cart = () => {
     }
 
     const checkoutHandler = () => {
-        alert('delete button');
+        history.push('/login?redirect=shipping');
     }
 
     
@@ -89,7 +89,7 @@ const Cart = () => {
                   <div className="cartGrossProfitBox">
                     <p>Gross Total</p>
                     <p>{`₹${cartItems.reduce(
-                      (acc, item) => acc + item.quantity * item.price,
+                      (previous, current) => previous + current.quantity * current.price,
                       0
                     )}`}</p>
                   </div>

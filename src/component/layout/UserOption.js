@@ -85,7 +85,13 @@ const UserOption = ({loggedInUser}) => {
         }
       >
         {options.map( (item) => (
-          <SpeedDialAction key={item.name} icon={item.icon} tooltipTitle={item.name} onClick={item.func} />
+          <SpeedDialAction 
+            key={item.name} 
+            icon={item.icon} 
+            tooltipTitle={item.name} 
+            onClick={item.func} 
+            tooltipOpen={window.innerWidth <= 600 ? true : false}
+          />
         ) )}
         
       </SpeedDial>
